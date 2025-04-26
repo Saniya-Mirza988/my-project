@@ -1,0 +1,180 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI-Powered Course Recommendation System Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f7f7f7;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .controls {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 25px;
+        }
+        .chart-box {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .chart-box h4 {
+            margin: 0 0 10px;
+            text-align: center;
+        }
+        canvas {
+            max-width: 100%;
+            height: 250px !important;
+        }
+        .export-btn {
+            display: block;
+            margin: 10px auto 0;
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .export-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>AI-Powered Course Recommendation System Dashboard</h1>
+
+    <div class="controls">
+        <label for="filter">Filter by Domain:</label>
+        <select id="filter">
+            <option value="all">All</option>
+            <option value="Business">Business</option>
+            <option value="Development">Development</option>
+            <option value="Design">Design</option>
+            <!-- Add more options as needed -->
+        </select>
+    </div>
+
+    <div class="grid">
+        <div class="chart-box">
+            <h4>1. Subscribers Domain Wise</h4>
+            <canvas id="chart1"></canvas>
+            <button class="export-btn" onclick="downloadChart('chart1')">Export</button>
+        </div>
+
+        <div class="chart-box">
+            <h4>2. Courses Level Wise</h4>
+            <canvas id="chart2"></canvas>
+            <button class="export-btn" onclick="downloadChart('chart2')">Export</button>
+        </div>
+
+        <div class="chart-box">
+            <h4>3. Subscribers Year Wise</h4>
+            <canvas id="chart3"></canvas>
+            <button class="export-btn" onclick="downloadChart('chart3')">Export</button>
+        </div>
+
+        <div class="chart-box">
+            <h4>4. Profit Gained Year Wise</h4>
+            <canvas id="chart4"></canvas>
+            <button class="export-btn" onclick="downloadChart('chart4')">Export</button>
+        </div>
+
+        <div class="chart-box">
+            <h4>5. Profit Earned Month Wise</h4>
+            <canvas id="chart5"></canvas>
+            <button class="export-btn" onclick="downloadChart('chart5')">Export</button>
+        </div>
+
+        <div class="chart-box">
+            <h4>6. Subscribers Count Month Wise</h4>
+            <canvas id="chart6"></canvas>
+            <button class="export-btn" onclick="downloadChart('chart6')">Export</button>
+        </div>
+
+        <div class="chart-box">
+            <h4>7. Subscribers per Subject Category</h4>
+            <canvas id="chart7"></canvas>
+            <button class="export-btn" onclick="downloadChart('chart7')">Export</button>
+        </div>
+    </div>
+
+    <script>
+        // Dummy data placeholders - replace with Flask context data
+        var valuecounts = {{ valuecounts | tojson | safe }};
+        var levelcounts = {{ levelcounts | tojson | safe }};
+        var subscriberscountmap = {{ subscriberscountmap | tojson | safe }};
+        var yearwiseprofitmap = {{ yearwiseprofitmap | tojson | safe }};
+        var profitmonthwise = {{ profitmonthwise | tojson | safe }};
+        var monthwisesub = {{ monthwisesub | tojson | safe }};
+        var subjectsperlevel = {{ subjectsperlevel | tojson | safe }};
+
+        var colors = [
+            'rgba(255, 99, 132, 0.6)', 'rgba(54, 162, 235, 0.6)', 
+            'rgba(255, 206, 86, 0.6)', 'rgba(75, 192, 192, 0.6)',
+            'rgba(153, 102, 255, 0.6)', 'rgba(255, 159, 64, 0.6)'
+        ];
+
+        function createChart(id, type, label, labels, data, options = {}) {
+            new Chart(document.getElementById(id), {
+                type: type,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: label,
+                        data: data,
+                        backgroundColor: colors,
+                        borderColor: colors,
+                        borderWidth: 2,
+                        fill: type === 'line',
+                        tension: 0.3
+                    }]
+                },
+                options: Object.assign({
+                    responsive: true,
+                    plugins: {
+                        tooltip: { enabled: true },
+                        legend: { display: true }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeOutQuart'
+                    },
+                    scales: { y: { beginAtZero: true } }
+                }, options)
+            });
+        }
+
+        // Create all charts
+        createChart('chart1', 'pie', 'Subscribers', Object.keys(valuecounts), Object.values(valuecounts));
+        createChart('chart2', 'pie', 'Course Levels', Object.keys(levelcounts), Object.values(levelcounts));
+        createChart('chart3', 'bar', 'Subscribers', Object.keys(subscriberscountmap), Object.values(subscriberscountmap));
+        createChart('chart4', 'bar', 'Yearly Profit', Object.keys(yearwiseprofitmap), Object.values(yearwiseprofitmap));
+        createChart('chart5', 'bar', 'Monthly Profit', Object.keys(profitmonthwise), Object.values(profitmonthwise));
+        createChart('chart6', 'bar', 'Monthly Subscribers', Object.keys(monthwisesub), Object.values(monthwisesub));
+        createChart('chart7', 'line', 'Subject Subscribers', Object.keys(subjectsperlevel), Object.values(subjectsperlevel));
+
+        // Export chart as image
+        function downloadChart(chartId) {
+            const canvas = document.getElementById(chartId);
+            const image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+            const link = document.createElement('a');
+            link.download = chartId + ".png";
+            link.href = image;
+            link.click();
+        }
+    </script>
+</body>
+</html>

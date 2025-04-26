@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>AI Powered course recomadation system | Home</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <style>
+        .card-body {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .card:hover .card-body {
+            transform: scale(1.02);
+        }
+
+        .tooltip-inner {
+            max-width: 300px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">AI powerd course recommendation system-course finder</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">Dashboard</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main role="main">
+        <section class="jumbotron text-center">
+            <div class="container">
+                <h4 class="jumbotron-heading">Enter the course name to get personalized recommendations</h4>
+                <form action="/" method="POST" class="my-4">
+                    <input name="course" type="text" class="form-control mb-2" id="course"
+                        placeholder="Eg: trading,javascript,web devolpment">
+                    <button type="submit" class="btn btn-primary" data-toggle="tooltip" data-placement="top"
+                        title="Get best matching course results">Recommend</button>
+                </form>
+
+                {% if showtitle %}
+                <h4>Recommendations for "<span class="text-danger">{{ coursename }}</span>"</h4>
+                {% endif %}
+            </div>
+        </section>
+
+        <div class="album py-5 bg-light">
+            <div class="container">
+                {% if showerror %}
+                <div class="alert alert-warning text-center" role="alert">
+                    <h5>Sorry! We couldn't find courses for "<strong>{{ coursename }}</strong>"</h5>
+                    <p>We'll notify the Course Administrator to upload relevant content soon.</p>
+                    <a href="/" class="btn btn-sm btn-outline-dark">Try Again</a>
+                </div>
+                {% endif %}
+
+                <div class="row">
+                    {% for course in coursemap %}
+                    <div class="col-md-4">
+                        <div class="card mb-4 shadow-sm">
+                            <div class="card-body bg-dark text-white">
+                                <h5>{{ course }}</h5>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <a href="{{ coursemap[course] }}" target="_blank" class="btn btn-sm btn-outline-light"
+                                        data-toggle="tooltip" title="View course on original platform">View Course</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Optional JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+    </script>
+</body>
+
+</html>
